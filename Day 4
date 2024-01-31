@@ -1,0 +1,44 @@
+###########################################################
+------------------- Day 4 ----------------
+###########################################################
+## Packages ## 
+library(pacman)
+p_load('tidyverse', 'stringr', "purrr")
+#Read Input 
+input4 <- read.table('input_4_test.txt',
+                     header = FALSE, 
+                     sep = ":",
+                     stringsAsFactors = FALSE,
+                     fill = TRUE,
+                     comment.char = "") 
+#Outcome Part 1 -----
+input_4_mod  <- input4 |>  
+                select(-c(V1)) |>  
+                separate(V2, 
+                         into = c("winning", "others"), 
+                         sep = "\\|")  |>  
+                mutate( winning = str_extract_all(winning, '\\d+'),
+                        others = str_extract_all(others, '\\d+')) |> 
+                mutate(comparison = as.numeric(map2(winning, others, ~sum(.y %in% .x)))) |>  
+                mutate(points = if_else(comparison > 0, 2 ^ (comparison - 1) , comparison))  
+  
+#Outcome
+outcome_4.1 <-sum(input_4_mod$points)
+
+#Outcome Part 2 -----
+n_cards <- nrow(input_4_mod)
+matches <- input_4_mod$comparison
+cards_scratches <- rep(1, n_cards)
+
+for (i in seq_len(n_cards)) { 
+  if (matches[i] > 0) {
+       count <- seq(i +1,min(i + matches[i]))
+       print(count)
+       print(cards_scratches[count])
+       print(cards_scratches[i])
+       cards_scratches[count] <- cards_scratches[count] + cards_scratches[i]
+       print(cards_scratches)
+    }
+  }
+#Outcome
+outcome_4.2 <- sum(cards_scratches)
