@@ -1,0 +1,31 @@
+#Day 2 ----
+##Part 1 ----
+input_2  <- read.delim('input_2.txt',
+                      sep = ":",
+                      header =  FALSE)
+#Transform data
+input_2  <- input_2  |> 
+            select(V2) |>  
+            mutate(game = row_number())  |>  
+            separate_rows(V2, sep = ';') |>  
+            separate_rows(V2, sep = ',') |> 
+            mutate(V2 = str_trim(V2)) |> 
+            separate(V2, c('number', 'color', sep = " "))
+#Constraints
+colors_max <- c(red = 12 , green = 13 , blue = 14 )
+#Output 1 
+output <- input_2 |>  
+          mutate(number = as.numeric(number),
+                  id = colors_max[color], 
+                  constrain = if_else(number > id , 'Yes', 'No'))   |>  
+          group_by(game) |>  
+          summarise(valid_cubes =  any(constrain == 'Yes')) |>  
+          filter(valid_cubes ==  FALSE) |> 
+          summarise(sum(game))
+##Part 2 ----- 
+outcome_2 <- input_2 |>  
+              group_by(game,color) |>  
+              summarise(max_color =  max(as.numeric(number),  na.rm = TRUE)) |>  
+              summarize(prod = prod(max_color)) |>  
+              summarise(sum(prod))
+print(outcome_2)
