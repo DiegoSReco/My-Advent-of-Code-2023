@@ -1,0 +1,78 @@
+###########################################################
+------------------- "Advent of Code  2023" ----------------
+###########################################################
+## Packages ## 
+library(pacman)
+p_load('tidyverse', 'stringr', "purrr")
+
+#Day 1 ----
+## Part 1 -----
+input <- read.table('input.txt')
+
+#Extract  numbers function
+extract_numbers <- function(string){ 
+      digits <- str_extract_all(string,"[[:digit:]]+", simplify = TRUE)
+      digits_concatenate <- paste0(digits, collapse = "")
+      return(digits_concatenate)
+}
+#Apply Function and extract calibration value 
+input <- input |>  
+         mutate(calibration_values =  map_chr( V1, extract_numbers),
+                first_pos = substr(calibration_values,1,1),
+                last_pos  = substr(calibration_values,
+                                   nchar(calibration_values),
+                                   nchar(calibration_values)),
+                 calibration_out = as.numeric(paste0(first_pos, last_pos))) 
+#Outcome
+outcome <- input %>%
+           summarise(sum_calibration_values = sum(calibration_out ))
+
+## Part 2 ----
+input2 <- read.table('input.txt')
+
+#Function for replace words with numbers
+replace_words <- function(input_string) { 
+  words_replacement <- list( oneight   = "oneeight",
+                             threeight = "threeeight",
+                             fiveight  = "fiveeight",
+                             nineight  = "nineeight",
+                             twone     = "twoone",
+                             sevenine  = "sevennine",
+                             eightwo   = "eighttwo")
+  for (pattern in names(words_replacement)) {
+                   input_string <- str_replace_all(input_string,
+                                                  pattern,
+                                                  words_replacement[[pattern]])
+  }
+  
+   words_digits <- list( one = "1", 
+                         two = "2", 
+                         three ="3", 
+                         four  = "4", 
+                         five = "5",
+                         six = "6", 
+                         seven = "7",
+                         eight = "8",
+                         nine = "9" )
+ 
+ for (word in names(words_digits)) {
+                    input_string <- str_replace_all(input_string,
+                                                     word,
+                                                     words_digits[[word]])
+   
+                      }
+  return(input_string) }
+#Apply Function and extract calibration value 
+input2 <- input2 |>  
+           mutate(
+                   string_replace_words =  map_chr( V1, replace_words) , 
+                   string_digits = map_chr(string_replace_words ,extract_numbers), 
+                   first_pos = substr(string_digits, 1,1) , 
+                   last_pos = substr(string_digits, 
+                                     nchar(string_digits),
+                                     nchar(string_digits)), 
+                   calibration_out = as.numeric(paste0(first_pos, last_pos)))
+#Outcome
+outcome2 <- input2 %>%
+             summarise(sum_calibration_values = sum(calibration_out ))
+print(outcome2)
