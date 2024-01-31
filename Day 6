@@ -1,0 +1,22 @@
+###########################################################
+------------------- Day 6  ----------------
+###########################################################
+## Packages ## 
+library(pacman)
+p_load('tidyverse', 'stringr', "purrr") 
+input_6 <- read.table("input_6_test.txt") |>  
+           select(-V1)
+time  <- input_6[1,]
+distance <- input_6[2,]
+func_record <- function(time, record) { 
+   charge  <- seq(0, time)
+   record2 <- (time - charge) * charge
+   sum(record2 > record) }
+#Part 1 -----
+#Outcome
+prod(map2_dbl(time, distance, func_record))
+#Part 2 ----
+correct_time <- as.numeric(paste(time, collapse = ""))
+correct_distance <- as.numeric(paste(distance, collapse = ""))
+#Outcome 
+prod(func_record(correct_time, correct_distance))
